@@ -1,0 +1,1 @@
+export default function slugPage() { return <div>slugPage</div>; }
