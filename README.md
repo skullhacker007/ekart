@@ -142,25 +142,176 @@ pnpm prisma studio
 
 ---
 
-## 💾 Database Logic
+<h2 style="color: #F97316;">💾 Database Logic</h2>
 
 The backend data layer is deliberately structured for maintainability and separation of concerns.
 
 ### 1. The Schema (`prisma/schema.prisma`)
-This single file is the source of truth for the entire database structure. 
-- **Users**: Core user accounts and addresses.
-- **Catalog System**: Categories (tree structure), Brands, and Products.
-- **Variant Engine**: A dynamic attribute system (`Attribute`, `AttributeValue`, `VariantAttribute`) to handle complex product variations (like size/color combinations).
-- **Core Operations**: Tables for Orders, CartItems, and Inventory tracking.
+This single file is the source of truth for the entire database structure.
+-   **Users**: Core user accounts and addresses.
+-   **Catalog System**: Categories (tree structure), Brands, and Products.
+-   **Variant Engine**: A dynamic attribute system (`Attribute`, `AttributeValue`, `VariantAttribute`) to handle complex product variations (like size/color combinations).
+-   **Core Operations**: Tables for Orders, CartItems, and Inventory tracking.
 
 ### 2. Database Connection (`src/lib/db/prisma.ts`)
-We use a singleton pattern for the Prisma Client. 
-- **Why?** In development, Next.js frequently hot-reloads the application. If we created a new client on every reload, we would quickly exhaust the database connections and crash the app. This file attaches the Prisma client to the global namespace, ensuring only one connection pool exists.
-- **Usage:** *Never* instantiate `new PrismaClient()` in your features. Always import the client from this file: `import { prisma } from "@/src/lib/db/prisma";`
+We use a singleton pattern for the Prisma Client.
+-   **Why?** In development, Next.js frequently hot-reloads the application. If we created a new client on every reload, we would quickly exhaust the database connections and crash the app. This file attaches the Prisma client to the global namespace, ensuring only one connection pool exists.
+-   **Usage:** *Never* instantiate `new PrismaClient()` in your features. Always import the client from this file: `import { prisma } from "@/src/lib/db/prisma";`
 
 ### 3. The Repository Layer (`src/lib/repositories/`)
 We use the Repository Pattern to abstract away direct database calls. Instead of calling Prisma directly inside Next.js Server Actions or API routes, we call repository functions.
-- **`product.repository.ts`**: Handles finding products, variants, and their nested relations (images, brands). Example: `findProductBySlug()`.
-- **`category.repository.ts`**: Handles fetching tree structures, like grabbing the top-level categories and their children.
-- **`order.repository.ts`**: Centralizes order creation and retrieval.
-- **Why?** This keeps business logic clean and makes it easy to mock database calls in the future if unit testing is introduced.
+-   **`product.repository.ts`**: Handles finding products, variants, and their nested relations (images, brands). Example: `findProductBySlug()`.
+-   **`category.repository.ts`**: Handles fetching tree structures, like grabbing the top-level categories and their children.
+-   **`order.repository.ts`**: Centralizes order creation and retrieval.
+-   **Why?** This keeps business logic clean and makes it easy to mock database calls in the future if unit testing is introduced.
+
+<h2 style="color: #F97316;">⚙️ Backend Logic</h2>
+
+The following is our comprehensive blueprint for building out the e-commerce backend APIs and Services.
+
+### 1. System Foundation (Required)
+- **Project Structure:** Feature modules, shared libraries, and global utilities.
+- **Environment Configuration:** Validation using Zod.
+
+### 2. Database Layer (Required)
+- **Schema Design:** Users, Catalog, Variants, Inventory, Orders, Payments, Shipping.
+- **ORM Integration:** Prisma client, connection management.
+- **Optimization:** Indexes and foreign keys.
+
+### 3. Core Backend Architecture (Required)
+- **Repository Layer:** Data access abstraction. 
+- **Service Layer:** Business logic and domain operations.
+- **Validation Layer:** Input request validation.
+- **API / Server Actions Layer:** Next.js Data mutations and retrieval endpoints.
+
+### 4. Authentication & Authorization (Required)
+- **Authentication System:** User registration, login, and session management.
+- **Security:** Password hashing, token validation, CSRF/CORS.
+
+### 5. Catalog Domain (Required)
+- **Admin Management:** Categories, Brands, Products, Variants, Attributes.
+- **Search & Filtering:** Keyword search, price filtering, and attribute filtering.
+
+### 6. Inventory Domain (Required)
+- **Management:** Stock tracking, warehouse management.
+- **Reservation System:** Reserve stock securely during checkout flow.
+
+### 7. Cart Domain (Required)
+- **Cart Service:** Add/update/remove items.
+
+### 8. Checkout Domain (Required - High Priority)
+- **Checkout Service:** Cart validation, inventory validation, price calculation.
+- **Idempotency Strategy:** Implement strict idempotency keys to ensure users are never double-charged if they click "Pay" multiple times.
+
+### 9. Order Domain (Required)
+- **Order Management:** Creation, items, status updates, and history tracking.
+
+### 10. Payment Domain (Required - High Priority)
+- **Payment Service:** Secure creation, verification, capture, and refunds. Integrates tightly with Idempotency keys.
+
+### 11. Shipping Domain (Required)
+- **Shipping Service:** Shipment creation and tracking updates.
+
+### 12. Transactional Email Domain (Required)
+- **Notifications:** Order confirmations, shipping updates, daily/weekly offers, and new arrival blasts.
+
+### 13. Review Domain (Optional)
+- Product reviews, ratings, and moderation.
+
+### 14. Promotions Domain (Optional)
+- Coupons, discounts, campaigns, and rules.
+
+### 15. Admin Backend (Required)
+- Centralized Admin APIs for managing Products, Categories, Orders, Inventory, and Users.
+
+### 16. Logging, Monitoring, & Error Handling (Required)
+- Global error handling, API response standardization, and error tracking.
+
+### 17. Security Layer (Required)
+- Input validation, rate limiting, and endpoint protection.
+
+### 18. Performance Optimization (Required)
+- Database indexing, caching strategies.
+
+### Final Backend Implementation Order (Professional)
+
+1. **System Foundation**
+   - Architecture Design
+   - Project Structure
+   - Environment Configuration
+
+2. **Database Layer**
+   - Database Schema
+   - Database Migrations
+   - ORM Setup
+   - Database Optimization
+
+3. **Core Backend Architecture**
+   - Repository Layer
+   - Validation Layer
+   - Service Layer
+   - API / Server Actions (Optimized for fast, sub-100ms responses to prevent UI lag)
+   - **Pagination & Filtering Engine** (Cursor-based or offset pagination to handle thousands of products without slowing down)
+
+4. **Security Foundation (Initialized early)**
+   - Authentication & Authorization
+   - Security Setup
+   - CORS
+   - CSRF protection
+   - Rate limiting (Crucial to protect against spam / multiple rapid requests)
+
+5. **Infrastructure & Platform Services (Required)**
+   - **Asset / Media Upload Service:** Handles product image and media storage.
+   - **Logging & Monitoring:** Application logs, request tracking, and system monitoring.
+   - **Error Handling:** Centralized error handling and API response standardization.
+   - **Background Job / Queue System:** Offloads heavy or asynchronous tasks such as email sending, analytics processing, and stock synchronization to prevent blocking API requests.
+   - **Caching Layer:** Redis or in-memory caching for catalog data, high-traffic endpoints, and expensive database queries to reduce backend load and improve response times.
+
+6. **Catalog Domain**
+   - Catalog Admin Backend
+   - Product Search & Filtering (Optimized indexing for instant UI feedback)
+
+7. **Inventory Domain**
+   - Inventory Management
+
+8. **Cart Domain**
+   - Cart Service
+
+9. **Checkout Domain**
+   - Checkout Service
+   - Cart validation
+   - Inventory validation
+   - Price calculation
+   - Idempotency handling
+
+10. **Order Domain**
+    - Order Management
+
+11. **Payment Domain**
+    - Payment Service
+    - Payment Gateway Integration
+
+12. **Shipping Domain**
+    - Shipping Service
+
+13. **Communication Services (Triggered by events like order placed, shipment updates)**
+    - Transactional Email Service (Executed via Background Queue)
+
+14. **Admin Backend**
+    - Admin APIs
+
+15. **Performance Layer**
+    - Performance Optimization
+    - **Concurrency & Multiple Request Handling** (Optimized Prisma connection pooling to handle concurrent database hits smoothly)
+    - Query optimization
+
+16. **Optional Domains (Enhancements after core ecommerce works)**
+    - Review System
+    - Promotions System
+    - Analytics System
+
+17. **Future Extensions**
+    - Recommendation Engine
+    - Notifications System
+    - Search Engine Integration
+    - Event System

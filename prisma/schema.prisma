@@ -53,13 +53,13 @@ model User {
 }
 
 model UserAddress {
-  id        String @id @default(uuid())
-  userId    String
-  line1     String
-  line2     String?
-  city      String
-  state     String
-  country   String
+  id         String  @id @default(uuid())
+  userId     String
+  line1      String
+  line2      String?
+  city       String
+  state      String
+  country    String
   postalCode String
 
   user User @relation(fields: [userId], references: [id])
@@ -92,13 +92,13 @@ model Brand {
 }
 
 model Product {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
-  slug        String   @unique
+  slug        String  @unique
   description String?
 
-  brandId     String?
-  categoryId  String
+  brandId    String?
+  categoryId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -112,6 +112,7 @@ model Product {
 
   @@index([categoryId])
   @@index([brandId])
+  @@index([createdAt]) // For fast 'New Arrivals' sorting/pagination
 }
 
 model ProductImage {
@@ -126,16 +127,16 @@ model ProductImage {
 //////////////////// ATTRIBUTES ////////////////////
 
 model Attribute {
-  id          String  @id @default(uuid())
-  name        String
-  code        String  @unique
+  id           String  @id @default(uuid())
+  name         String
+  code         String  @unique
   isFilterable Boolean @default(false)
 
   values AttributeValue[]
 }
 
 model AttributeValue {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   attributeId String
   value       String
   slug        String?
@@ -165,6 +166,7 @@ model ProductVariant {
   orderItems OrderItem[]
 
   @@index([productId])
+  @@index([price]) // For fast price range filtering
 }
 
 model VariantAttribute {
@@ -206,11 +208,11 @@ model Inventory {
 }
 
 model InventoryMovement {
-  id          String   @id @default(uuid())
+  id          String                @id @default(uuid())
   inventoryId String
   type        InventoryMovementType
   quantity    Int
-  createdAt   DateTime @default(now())
+  createdAt   DateTime              @default(now())
 
   inventory Inventory @relation(fields: [inventoryId], references: [id])
 }
@@ -225,22 +227,28 @@ model CartItem {
 
   user    User           @relation(fields: [userId], references: [id])
   variant ProductVariant @relation(fields: [variantId], references: [id])
+
+  @@index([userId]) // For fast cart retrieval per user
 }
 
 //////////////////// ORDERS ////////////////////
 
 model Order {
-  id        String   @id @default(uuid())
-  userId    String
-  total     Float
-  status    OrderStatus
-  createdAt DateTime @default(now())
+  id             String      @id @default(uuid())
+  userId         String
+  total          Float
+  status         OrderStatus
+  createdAt      DateTime    @default(now())
+  idempotencyKey String?     @unique // Prevents double-charging/duplicate orders
 
-  user  User @relation(fields: [userId], references: [id])
+  user  User        @relation(fields: [userId], references: [id])
   items OrderItem[]
 
   payments Payment[]
   shipment Shipment?
+
+  @@index([userId])
+  @@index([createdAt]) // For fast order history fetching and pagination
 }
 
 model OrderItem {
@@ -257,15 +265,18 @@ model OrderItem {
 //////////////////// PAYMENTS ////////////////////
 
 model Payment {
-  id       String @id @default(uuid())
-  orderId  String
-  method   String
-  amount   Float
-  status   PaymentStatus
+  id             String        @id @default(uuid())
+  orderId        String
+  method         String
+  amount         Float
+  status         PaymentStatus
+  idempotencyKey String?       @unique // For explicit payment intent tracking
 
   order Order @relation(fields: [orderId], references: [id])
 
   transactions PaymentTransaction[]
+
+  @@index([orderId])
 }
 
 model PaymentTransaction {
@@ -281,11 +292,11 @@ model PaymentTransaction {
 //////////////////// SHIPPING ////////////////////
 
 model Shipment {
-  id        String @id @default(uuid())
-  orderId   String @unique
-  carrier   String
-  tracking  String?
-  status    String
+  id       String  @id @default(uuid())
+  orderId  String  @unique
+  carrier  String
+  tracking String?
+  status   String
 
   order Order @relation(fields: [orderId], references: [id])
 
@@ -293,7 +304,7 @@ model Shipment {
 }
 
 model ShipmentTracking {
-  id         String @id @default(uuid())
+  id         String   @id @default(uuid())
   shipmentId String
   status     String
   location   String?
@@ -305,7 +316,7 @@ model ShipmentTracking {
 //////////////////// REVIEWS ////////////////////
 
 model Review {
-  id        String @id @default(uuid())
+  id        String  @id @default(uuid())
   userId    String
   productId String
   rating    Int
