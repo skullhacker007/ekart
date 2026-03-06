@@ -1,0 +1,26 @@
+npm warn Unknown project config "node-linker". This will stop working in the next major version of npm.
+npm warn Unknown project config "public-hoist-pattern". This will stop working in the next major version of npm.
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Error: Prisma schema validation - (validate wasm)
+Error code: P1012
+error: Error parsing attribute "@relation": A one-to-one relation must use unique fields on the defining side. Either add an `@unique` attribute to the field `orderId`, or change the relation to one-to-many.
+  -->  prisma\schema.prisma:289
+   | 
+288 | 
+289 |   order Order @relation(fields: [orderId], references: [id])
+290 | 
+   | 
+error: Error validating field `user` in model `Review`: The relation field `user` on model `Review` is missing an opposite relation field on the model `User`. Either run `prisma format` or add it manually.
+  -->  prisma\schema.prisma:313
+   | 
+312 | 
+313 |   user    User    @relation(fields: [userId], references: [id])
+314 |   product Product @relation(fields: [productId], references: [id])
+   | 
+
+Validation Error Count: 2
+[Context: validate]
+
+Prisma CLI Version : 5.22.0
