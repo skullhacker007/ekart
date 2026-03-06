@@ -1,10 +1,21 @@
 /**
  * Inventory Repository — Prisma queries for stock management.
+ * NOTE: All write functions accept a pre-fetched inventory record to avoid
+ * redundant DB roundtrips. Callers (service layer) are responsible for
+ * fetching the record first via dbGetInventory / dbGetAvailableStock.
  */
 import { prisma } from '@/src/lib/db/prisma';
 import { InventoryMovementType } from '@prisma/client';
 
-export async function dbGetInventory(variantId: string) {
+export type InventoryRecord = {
+  id: string;
+  variantId: string;
+  warehouseId: string;
+  stock: number;
+  reserved: number;
+};
+
+export async function dbGetInventory(variantId: string): Promise<InventoryRecord | null> {
   return prisma.inventory.findFirst({
     where: { variantId },
     include: { warehouse: true },
@@ -17,9 +28,8 @@ export async function dbGetAvailableStock(variantId: string): Promise<number> {
   return Math.max(0, inv.stock - inv.reserved);
 }
 
-export async function dbReserveStock(variantId: string, quantity: number) {
-  const inv = await prisma.inventory.findFirst({ where: { variantId } });
-  if (!inv) throw new Error(`No inventory record for variant ${variantId}`);
+/** Reserve stock. Accepts pre-fetched inventory to avoid a second DB query. */
+export async function dbReserveStock(inv: InventoryRecord, quantity: number) {
   if (inv.stock - inv.reserved < quantity) throw new Error('Insufficient stock');
 
   return prisma.$transaction(async (tx) => {
@@ -34,8 +44,9 @@ export async function dbReserveStock(variantId: string, quantity: number) {
   });
 }
 
+/** Release reserved stock (e.g. cancellation). */
 export async function dbReleaseStock(variantId: string, quantity: number) {
-  const inv = await prisma.inventory.findFirst({ where: { variantId } });
+  const inv = await dbGetInventory(variantId);
   if (!inv) return;
   return prisma.inventory.update({
     where: { id: inv.id },
@@ -43,9 +54,8 @@ export async function dbReleaseStock(variantId: string, quantity: number) {
   });
 }
 
-export async function dbAdjustStock(variantId: string, quantity: number, type: InventoryMovementType) {
-  const inv = await prisma.inventory.findFirst({ where: { variantId } });
-  if (!inv) throw new Error('No inventory record found');
+/** Adjust total stock (STOCK_IN / ADJUSTMENT / RETURN). Accepts pre-fetched inventory. */
+export async function dbAdjustStock(inv: InventoryRecord, quantity: number, type: InventoryMovementType) {
   return prisma.$transaction(async (tx) => {
     const updated = await tx.inventory.update({
       where: { id: inv.id },
@@ -57,3 +67,4 @@ export async function dbAdjustStock(variantId: string, quantity: number, type: I
     return updated;
   });
 }
+

@@ -1,8 +1,8 @@
 import { NextRequest } from 'next/server';
 import { prepareCheckout } from '@/src/features/checkout/services/checkout.service';
-import { createOrder } from '@/src/features/orders/order.service';
 import { successResponse, errorResponse } from '@/src/lib/utils/response';
 import { AppError } from '@/src/lib/errors/AppError';
+
 
 function getUserId(req: NextRequest): string {
   const userId = req.headers.get('x-user-id');

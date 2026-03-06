@@ -1,51 +1,80 @@
 /**
- * Shipping Service — shipment creation and tracking updates.
+ * Shipping Service — business logic for shipment lifecycle.
+ * Called automatically on payment capture and by admin shipment update routes.
  */
-import { prisma } from '@/src/lib/db/prisma';
 import { AppError, NotFoundError } from '@/src/lib/errors/AppError';
 import { logger } from '@/src/lib/services/logger';
-import { updateOrderStatus } from '@/src/features/orders/order.service';
 import { queue } from '@/src/lib/queue/queueClient';
+import { updateOrderStatus } from '@/src/features/orders/order.service';
 import { OrderStatus } from '@prisma/client';
+import {
+  dbCreateShipment,
+  dbGetShipmentByOrder,
+  dbGetShipmentById,
+  dbUpdateShipmentStatus,
+  dbAddTrackingEvent,
+} from './shipping.repository';
 
-export async function createShipment(data: {
-  orderId: string; carrier: string; tracking?: string;
-}) {
-  const existing = await prisma.shipment.findUnique({ where: { orderId: data.orderId } });
-  if (existing) throw new AppError('Shipment already exists for this order', 409);
+const VALID_STATUSES = [
+  'PENDING', 'PACKED', 'PICKED_UP', 'IN_TRANSIT',
+  'OUT_FOR_DELIVERY', 'DELIVERED', 'FAILED', 'RETURNED',
+];
 
-  const shipment = await prisma.shipment.create({
-    data: { orderId: data.orderId, carrier: data.carrier, tracking: data.tracking, status: 'PROCESSING' },
-  });
-  await updateOrderStatus(data.orderId, OrderStatus.PACKED);
-  logger.info('Shipment created', { shipmentId: shipment.id, orderId: data.orderId });
+/** Called automatically when payment is captured — idempotent. */
+export async function createShipment(orderId: string, carrier = 'TBD', tracking?: string) {
+  const existing = await dbGetShipmentByOrder(orderId);
+  if (existing) return existing; // safe to return — idempotent
+
+  const shipment = await dbCreateShipment(orderId, carrier, tracking);
+  logger.info('Shipment created', { shipmentId: shipment.id, orderId });
   return shipment;
 }
 
-export async function updateTracking(shipmentId: string, status: string, location?: string) {
-  const shipment = await prisma.shipment.findUnique({ where: { id: shipmentId } });
+/** Fetch shipment + full tracking timeline for a given order (user-facing). */
+export async function getShipmentByOrder(orderId: string) {
+  const shipment = await dbGetShipmentByOrder(orderId);
   if (!shipment) throw new NotFoundError('Shipment');
+  return shipment;
+}
 
-  await prisma.$transaction(async (tx) => {
-    await tx.shipment.update({ where: { id: shipmentId }, data: { status } });
-    await tx.shipmentTracking.create({ data: { shipmentId, status, location } });
-  });
+/** Fetch shipment by ID (admin use). */
+export async function getShipmentById(shipmentId: string) {
+  const shipment = await dbGetShipmentById(shipmentId);
+  if (!shipment) throw new NotFoundError('Shipment');
+  return shipment;
+}
 
-  // Notify user via email when shipped or delivered
-  if (status === 'SHIPPED' || status === 'DELIVERED') {
-    await queue.enqueue('send-shipment-update', { orderId: shipment.orderId, status });
-    if (status === 'SHIPPED') await updateOrderStatus(shipment.orderId, OrderStatus.SHIPPED);
-    if (status === 'DELIVERED') await updateOrderStatus(shipment.orderId, OrderStatus.DELIVERED);
+/**
+ * Admin: update shipment status, optionally set tracking number, and append a timeline event.
+ * Also syncs the parent order status for key milestones (SHIPPED, DELIVERED).
+ */
+export async function updateTracking(
+  shipmentId: string,
+  status: string,
+  tracking?: string,
+  location?: string
+) {
+  if (!VALID_STATUSES.includes(status)) {
+    throw new AppError(`Invalid status. Allowed: ${VALID_STATUSES.join(', ')}`, 400);
   }
 
-  return prisma.shipment.findUnique({ where: { id: shipmentId }, include: { trackingEvents: true } });
-}
-
-export async function getShipmentByOrder(orderId: string) {
-  const shipment = await prisma.shipment.findUnique({
-    where: { orderId },
-    include: { trackingEvents: { orderBy: { createdAt: 'desc' } } },
-  });
+  const shipment = await dbGetShipmentById(shipmentId);
   if (!shipment) throw new NotFoundError('Shipment');
-  return shipment;
+
+  await dbUpdateShipmentStatus(shipmentId, status, tracking);
+  const event = await dbAddTrackingEvent(shipmentId, status, location);
+
+  // Sync order-level status for key milestones
+  if (status === 'SHIPPED') {
+    await updateOrderStatus(shipment.orderId, OrderStatus.SHIPPED);
+    await queue.enqueue('send-shipment-update', { shipmentId, orderId: shipment.orderId, status });
+  }
+
+  if (status === 'DELIVERED') {
+    await updateOrderStatus(shipment.orderId, OrderStatus.DELIVERED);
+    await queue.enqueue('send-shipment-update', { shipmentId, orderId: shipment.orderId, status });
+  }
+
+  logger.info('Shipment tracking updated', { shipmentId, status, location });
+  return { shipmentId, status, tracking, event };
 }

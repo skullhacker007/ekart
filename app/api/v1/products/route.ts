@@ -1,4 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { prisma } from '@/src/lib/db/prisma';
+import { productQuerySchema, createProductSchema } from '@/src/features/catalog/catalog.schema';
+import { successResponse, errorResponse } from '@/src/lib/utils/response';
+import { AppError } from '@/src/lib/errors/AppError';
+import { ZodError } from 'zod';
+import { cursorPagination, buildCursorPage } from '@/src/lib/utils/pagination';
+import { Prisma } from '@prisma/client';
 
 /**
  * @swagger
@@ -9,71 +16,99 @@ import { NextResponse } from 'next/server';
  *     parameters:
  *       - in: query
  *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *         description: Page number
+ *         schema: { type: integer, default: 1 }
  *       - in: query
  *         name: limit
- *         schema:
- *           type: integer
- *           default: 20
- *           maximum: 100
- *         description: Number of items per page
+ *         schema: { type: integer, default: 20, maximum: 100 }
+ *       - in: query
+ *         name: cursor
+ *         schema: { type: string }
  *       - in: query
  *         name: categoryId
- *         schema:
- *           type: string
- *           format: uuid
- *         description: Filter by category ID
+ *         schema: { type: string, format: uuid }
  *       - in: query
  *         name: brandId
- *         schema:
- *           type: string
- *           format: uuid
- *         description: Filter by brand ID
+ *         schema: { type: string, format: uuid }
  *       - in: query
  *         name: minPrice
- *         schema:
- *           type: number
- *         description: Minimum price filter
+ *         schema: { type: number }
  *       - in: query
  *         name: maxPrice
- *         schema:
- *           type: number
- *         description: Maximum price filter
+ *         schema: { type: number }
  *       - in: query
  *         name: keyword
- *         schema:
- *           type: string
- *         description: Keyword search
+ *         schema: { type: string }
+ *       - in: query
+ *         name: sortBy
+ *         schema: { type: string, enum: [createdAt, name], default: createdAt }
+ *       - in: query
+ *         name: sortOrder
+ *         schema: { type: string, enum: [asc, desc], default: desc }
  *     responses:
  *       200:
- *         description: A paginated list of products
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Product'
- *                 meta:
- *                   $ref: '#/components/schemas/PaginationMeta'
- *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *         description: Paginated products list
+ *       400:
+ *         description: Validation error
  */
-export async function GET(request: Request) {
-  // TODO: implement product listing logic using catalog service
-  return NextResponse.json({ success: true, data: [], meta: { page: 1, limit: 20, hasNextPage: false } });
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const query = productQuerySchema.parse(Object.fromEntries(searchParams));
+
+    const { limit, cursor, categoryId, brandId, minPrice, maxPrice, keyword, sortBy, sortOrder } = query;
+
+    // Build WHERE clause
+    const where: Prisma.ProductWhereInput = {
+      ...(categoryId ? { categoryId } : {}),
+      ...(brandId ? { brandId } : {}),
+      // Keyword search across name and description
+      ...(keyword
+        ? {
+            OR: [
+              { name: { contains: keyword, mode: 'insensitive' } },
+              { description: { contains: keyword, mode: 'insensitive' } },
+            ],
+          }
+        : {}),
+      // Price filter on variants
+      ...(minPrice !== undefined || maxPrice !== undefined
+        ? {
+            variants: {
+              some: {
+                price: {
+                  ...(minPrice !== undefined ? { gte: minPrice } : {}),
+                  ...(maxPrice !== undefined ? { lte: maxPrice } : {}),
+                },
+              },
+            },
+          }
+        : {}),
+    };
+
+    const paginationArgs = cursorPagination({ limit, cursor });
+
+    const products = await prisma.product.findMany({
+      ...paginationArgs,
+      where,
+      orderBy: { [sortBy]: sortOrder },
+      include: {
+        category: { select: { id: true, name: true, slug: true } },
+        brand: { select: { id: true, name: true, slug: true } },
+        images: { take: 1, orderBy: { position: 'asc' } },
+        variants: {
+          select: { id: true, sku: true, price: true },
+          orderBy: { price: 'asc' },
+          take: 10,
+        },
+      },
+    });
+
+    return successResponse(buildCursorPage(products, limit));
+  } catch (err) {
+    if (err instanceof ZodError) return errorResponse(err.issues[0].message, 400);
+    if (err instanceof AppError) return errorResponse(err.message, err.statusCode);
+    return errorResponse('Failed to fetch products', 500);
+  }
 }
 
 /**
@@ -94,10 +129,8 @@ export async function GET(request: Request) {
  *             properties:
  *               name:
  *                 type: string
- *                 example: iPhone 15
  *               slug:
  *                 type: string
- *                 example: iphone-15
  *               description:
  *                 type: string
  *               categoryId:
@@ -108,31 +141,52 @@ export async function GET(request: Request) {
  *                 format: uuid
  *     responses:
  *       201:
- *         description: Product created successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   $ref: '#/components/schemas/Product'
+ *         description: Product created
  *       400:
  *         description: Validation error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  *       401:
  *         description: Unauthorized
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *       409:
+ *         description: Slug already exists
  */
-export async function POST(request: Request) {
-  // TODO: implement product creation logic using catalog service
-  return NextResponse.json({ success: true, data: {} }, { status: 201 });
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const input = createProductSchema.parse(body);
+
+    // Check slug uniqueness
+    const existing = await prisma.product.findUnique({ where: { slug: input.slug } });
+    if (existing) throw new AppError(`Slug "${input.slug}" is already taken`, 409);
+
+    // Validate category exists
+    const category = await prisma.category.findUnique({ where: { id: input.categoryId } });
+    if (!category) throw new AppError('Category not found', 404);
+
+    // Validate brand if provided
+    if (input.brandId) {
+      const brand = await prisma.brand.findUnique({ where: { id: input.brandId } });
+      if (!brand) throw new AppError('Brand not found', 404);
+    }
+
+    const product = await prisma.product.create({
+      data: {
+        name: input.name,
+        slug: input.slug,
+        description: input.description ?? null,
+        categoryId: input.categoryId,
+        brandId: input.brandId ?? null,
+      },
+      include: {
+        category: { select: { id: true, name: true } },
+        brand: { select: { id: true, name: true } },
+      },
+    });
+
+    return successResponse(product, 201);
+  } catch (err) {
+    if (err instanceof ZodError) return errorResponse(err.issues[0].message, 400);
+    if (err instanceof AppError) return errorResponse(err.message, err.statusCode);
+    return errorResponse('Failed to create product', 500);
+  }
 }
+

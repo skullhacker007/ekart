@@ -7,7 +7,9 @@ import { logger } from '@/src/lib/services/logger';
 import { queue } from '@/src/lib/queue/queueClient';
 import { dbCreatePayment, dbCapturePayment, dbRefundPayment, dbGetPaymentByOrder } from './payment.repository';
 import { updateOrderStatus } from '@/src/features/orders/order.service';
+import { createShipment } from '@/src/features/shipping/services/shipping.service';
 import { OrderStatus } from '@prisma/client';
+
 
 export async function initiatePayment(data: {
   orderId: string; method: string; amount: number; idempotencyKey: string;
@@ -21,6 +23,8 @@ export async function capturePayment(paymentId: string, gatewayRef: string, orde
   const payment = await dbCapturePayment(paymentId, gatewayRef);
   // Update order status to CONFIRMED after successful payment
   await updateOrderStatus(orderId, OrderStatus.CONFIRMED);
+  // Auto-create a PENDING shipment record for the order
+  await createShipment(orderId);
   // Fire order confirmation email via background queue
   await queue.enqueue('send-order-confirmation', { orderId, paymentId });
   logger.info('Payment captured', { paymentId, orderId });

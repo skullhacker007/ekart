@@ -1,12 +1,10 @@
 import { NextRequest } from 'next/server';
 import { createProduct, updateProduct, deleteProduct, listProducts, listCategories, listBrands } from '@/src/features/catalog/services/catalog.service';
-import { updateOrderStatus } from '@/src/features/orders/order.service';
-import { addStock } from '@/src/features/inventory/services/inventory.service';
 import { successResponse, errorResponse } from '@/src/lib/utils/response';
 import { AppError } from '@/src/lib/errors/AppError';
 import { createProductSchema, productQuerySchema } from '@/src/features/catalog/catalog.schema';
-import { OrderStatus, InventoryMovementType } from '@prisma/client';
 import { z } from 'zod';
+
 
 function getRole(req: NextRequest): string {
   return req.headers.get('x-user-role') ?? 'USER';
