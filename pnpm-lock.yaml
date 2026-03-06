@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@powersync/react':
+        specifier: ^1.9.0
+        version: 1.9.0(@powersync/common@1.48.0)(react@18.3.1)
+      '@powersync/web':
+        specifier: ^1.35.0
+        version: 1.35.0(@journeyapps/wa-sqlite@1.5.0)(@powersync/common@1.48.0)
       '@prisma/client':
         specifier: ^5.22.0
         version: 5.22.0(prisma@5.22.0)
@@ -29,6 +35,9 @@ importers:
       react-hot-toast:
         specifier: ^2.6.0
         version: 2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      uuid:
+        specifier: ^13.0.0
+        version: 13.0.0
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -66,6 +75,9 @@ packages:
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
+
+  '@journeyapps/wa-sqlite@1.5.0':
+    resolution: {integrity: sha512-oASXW/9Ktbhn6kJjxCJzRKxNnlOyj7GKBLF/59dkz1kbOLw7kAXBTwWTUvqfT97OEshtrK/J8bJUYbpggdCZ9Q==}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -149,6 +161,22 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
+  '@powersync/common@1.48.0':
+    resolution: {integrity: sha512-CMnQQdQdheJMOobcQJWPW2CLv17+Yyqtg+zk+kS45EyZSV5wnC5tiRcsrGb6f3ShvHSfKaHZJFIySgp9Lbkkbg==}
+
+  '@powersync/react@1.9.0':
+    resolution: {integrity: sha512-FypJ1RSQXhbpLJ1WOSLi1ph+q6JXAX5GHqXhczaOr0dhngsr1zHIsFTANh6N0tfx838SM+MDgYO1d0LZxv1WWw==}
+    peerDependencies:
+      '@powersync/common': ^1.47.0
+      react: '*'
+
+  '@powersync/web@1.35.0':
+    resolution: {integrity: sha512-ks2XrtHzENMBEUBkgtzpXdZGDOeN8s9N/bQj21Ty1eMRo1tbGZYSMmTb0F2GCuTCIVKaWq2O11o3TX4fw2lc9g==}
+    hasBin: true
+    peerDependencies:
+      '@journeyapps/wa-sqlite': ^1.5.0
+      '@powersync/common': ^1.48.0
+
   '@prisma/client@5.22.0':
     resolution: {integrity: sha512-M0SVXfyHnQREBKxCgyo7sffrKttwE6R8PMq330MIUF0pTwjUhLbW84pFDlf06B27XyCR++VtjugEnIHdr07SVA==}
     engines: {node: '>=16.13'}
@@ -207,6 +235,9 @@ packages:
   arg@5.0.2:
     resolution: {integrity: sha512-PYjyFOLKQ9y57JvQ6QLo8dAgNqswh8M1RMJYdQduT6xbWSgK36P/Z/v+p888pM69jMMfS8Xd8F6I1kQ/I9HUGg==}
 
+  async-mutex@0.5.0:
+    resolution: {integrity: sha512-1A94B18jkJ3DYq284ohPxoXbfTA5HsQ7/Mf4DEhcyLx3Bz27Rh59iScbB6EPiP+B+joue6YCxcMXSbFC1tZKwA==}
+
   autoprefixer@10.4.27:
     resolution: {integrity: sha512-NP9APE+tO+LuJGn7/9+cohklunJsXWiaWEfV3si4Gi/XHDwVNgkwr1J3RQYFIvPy76GmJ9/bW8vyoU1LcxwKHA==}
     engines: {node: ^10 || ^12 || >=14}
@@ -236,6 +267,10 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
 
+  bson@6.10.4:
+    resolution: {integrity: sha512-WIsKqkSC0ABoBJuT1LEX+2HEvNmNKKgnTAyd0fL8qzK4SH2i9NXg+t08YtdZp/V9IZ33cxe3iV4yM0qg8lMQng==}
+    engines: {node: '>=16.20.1'}
+
   busboy@1.6.0:
     resolution: {integrity: sha512-8SFQbg/0hQ9xy3UNTB0YEnsNBbWfhf7RtnzpL7TkBiTBRfrQ9Fxcnz7VJsleJpyp6rVLvXiuORqjlHi5q+PYuA==}
     engines: {node: '>=10.16.0'}
@@ -253,6 +288,13 @@ packages:
 
   client-only@0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
+
+  comlink@4.4.2:
+    resolution: {integrity: sha512-OxGdvBmJuNKSCMO4NTl1L47VRp6xn2wG4F/2hYzB6tiCb709otOxtEYCSvK80PtjODfXXZu8ds+Nw5kVCjqd2g==}
+
+  commander@12.1.0:
+    resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
+    engines: {node: '>=18'}
 
   commander@4.1.1:
     resolution: {integrity: sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA==}
@@ -278,6 +320,9 @@ packages:
   escalade@3.2.0:
     resolution: {integrity: sha512-WUj2qlxaQtO4g6Pq5c29GTcWGDyd8itL8zTlipgECz3JesAiiOKotd8JU6otB3PACgG6xkJUyVhboMS+bje/jA==}
     engines: {node: '>=6'}
+
+  event-iterator@2.0.0:
+    resolution: {integrity: sha512-KGft0ldl31BZVV//jj+IAIGCxkvvUkkON+ScH6zfoX+l+omX6001ggyRSpI0Io2Hlro0ThXotswCtfzS8UkIiQ==}
 
   fast-glob@3.3.3:
     resolution: {integrity: sha512-7MptL8U0cqcFdzIzwOTHoilX9x5BrNqye7Z/LuC7kCMRio1EMSyqRK3BEAUD7sXRq4iT4AzTVuZdhgQ2TCvYLg==}
@@ -613,12 +658,18 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
+  uuid@13.0.0:
+    resolution: {integrity: sha512-XQegIaBTVUjSHliKqcnFqYypAd4S+WCYt5NIeRs6w/UAry7z8Y9j5ZwRRL4kzq9U3sD6v+85er9FvkEaBpji2w==}
+    hasBin: true
+
   zod@4.3.6:
     resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
+
+  '@journeyapps/wa-sqlite@1.5.0': {}
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
@@ -674,6 +725,25 @@ snapshots:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
+
+  '@powersync/common@1.48.0':
+    dependencies:
+      async-mutex: 0.5.0
+      event-iterator: 2.0.0
+
+  '@powersync/react@1.9.0(@powersync/common@1.48.0)(react@18.3.1)':
+    dependencies:
+      '@powersync/common': 1.48.0
+      react: 18.3.1
+
+  '@powersync/web@1.35.0(@journeyapps/wa-sqlite@1.5.0)(@powersync/common@1.48.0)':
+    dependencies:
+      '@journeyapps/wa-sqlite': 1.5.0
+      '@powersync/common': 1.48.0
+      async-mutex: 0.5.0
+      bson: 6.10.4
+      comlink: 4.4.2
+      commander: 12.1.0
 
   '@prisma/client@5.22.0(prisma@5.22.0)':
     optionalDependencies:
@@ -735,6 +805,10 @@ snapshots:
 
   arg@5.0.2: {}
 
+  async-mutex@0.5.0:
+    dependencies:
+      tslib: 2.8.1
+
   autoprefixer@10.4.27(postcss@8.5.8):
     dependencies:
       browserslist: 4.28.1
@@ -762,6 +836,8 @@ snapshots:
       node-releases: 2.0.36
       update-browserslist-db: 1.2.3(browserslist@4.28.1)
 
+  bson@6.10.4: {}
+
   busboy@1.6.0:
     dependencies:
       streamsearch: 1.1.0
@@ -784,6 +860,10 @@ snapshots:
 
   client-only@0.0.1: {}
 
+  comlink@4.4.2: {}
+
+  commander@12.1.0: {}
+
   commander@4.1.1: {}
 
   cssesc@3.0.0: {}
@@ -797,6 +877,8 @@ snapshots:
   electron-to-chromium@1.5.307: {}
 
   escalade@3.2.0: {}
+
+  event-iterator@2.0.0: {}
 
   fast-glob@3.3.3:
     dependencies:
@@ -1106,5 +1188,7 @@ snapshots:
       picocolors: 1.1.1
 
   util-deprecate@1.0.2: {}
+
+  uuid@13.0.0: {}
 
   zod@4.3.6: {}
