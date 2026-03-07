@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { logger } from "../src/lib/services/logger";
 
 const prisma = new PrismaClient();
 
@@ -10,9 +11,9 @@ async function main() {
         ],
     });
 
-    console.log("Seed completed");
+    logger.info('Seed completed');
 }
 
 main()
-    .catch(console.error)
+    .catch((e) => logger.error('Seed failed', { error: e }))
     .finally(() => prisma.$disconnect());

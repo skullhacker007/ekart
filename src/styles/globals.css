@@ -2,3 +2,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #ffffff; /* White body */
+    --foreground: #111111; /* Black fonts */
+    
+    /* Primary E-commerce color (Orange) */
+    --primary: #fb641b; /* Flipkart-style Orange */
+    --primary-foreground: #ffffff;
+    
+    /* Secondary Colors */
+    --secondary: #2874f0; /* Flipkart blue, used occasionally for links */
+    --secondary-foreground: #ffffff;
+    
+    /* Layout styling */
+    --muted: #f1f3f6; /* Flipkart off-white background for cards/sections */
+    --muted-foreground: #878787;
+    
+    --border: #e0e0e0;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    @apply antialiased;
+  }
+}
+
+@layer components {
+  /* Common e-commerce utility classes */
+  .container-custom {
+    @apply max-w-[1400px] mx-auto px-4 sm:px-6;
+  }
+}

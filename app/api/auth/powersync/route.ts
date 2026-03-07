@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { SignJWT, importPKCS8 as joseImportPKCS8 } from 'jose';
-// import { prisma } from '../../../../lib/db/prisma'; // Optional, to verify user logic
 
 // Generating an authorization token for PowerSync to access the logical replication server
 export async function GET(req: NextRequest) {

@@ -1,4 +1,5 @@
 import { PowerSyncDatabase, Schema, Table, column } from '@powersync/web';
+import { logger } from '@/src/lib/services/logger';
 
 // The local SQLite schema mapping for PowerSync
 // Define the tables we want to sync locally from our Neon database
@@ -41,10 +42,10 @@ export class BackendConnector {
     };
   }
 
-  async uploadData(database: any) {
-    // If we want two-way sync (client sends data back to server directly)
-    // We would implement offline mutations here.
-    // In our architecture, basic writes will still go through our Next.js API Routes.
+  async uploadData(database: PowerSyncDatabase) {
+    // Placeholder for two-way sync (client → server) offline mutations.
+    // This method is intentionally typed so `strict` TS mode surfaces further issues.
+    logger.debug('BackendConnector.uploadData called');
   }
 }
 

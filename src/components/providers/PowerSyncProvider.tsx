@@ -3,6 +3,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { PowerSyncContext } from '@powersync/react';
 import { db, connector } from '../../lib/db/powersync';
+import { LoaderPage } from '../ui/loader-page';
 
 export function PowerSyncProvider({ children }: { children: ReactNode }) {
   const [powerSyncInitialized, setPowerSyncInitialized] = useState(false);
@@ -24,7 +25,7 @@ export function PowerSyncProvider({ children }: { children: ReactNode }) {
 
   // While initializing, we can show a loader or just render nothing/fallback
   if (!powerSyncInitialized) {
-    return <div>Initializing local database...</div>;
+    return <LoaderPage />;
   }
 
   return (
