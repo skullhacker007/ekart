@@ -8,7 +8,7 @@
  *   await queue.enqueue('send-email', { to, subject, body });
  */
 
-import { logger } from '@/src/lib/services/logger';
+import { logger } from "@/src/lib/services/logger";
 
 export type JobPayload = Record<string, unknown>;
 export type JobHandler = (payload: JobPayload) => Promise<void>;
