@@ -1,8 +1,10 @@
+import withBundleAnalyzer from '@next/bundle-analyzer';
+
+const withBundle = withBundleAnalyzer({ enabled: process.env.ANALYZE === 'true' });
+
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
-import withPlausibleProxy from '@vercel/plausible-proxy/nextjs'
-import withBundleAnalyzer from '@next/bundle-analyzer'
+const nextConfig = {
+	reactStrictMode: true,
+};
 
-const withBundle = withBundleAnalyzer({ enabled: process.env.ANALYZE === 'true' })
-
-export default nextConfig;
+export default withBundle(nextConfig);
