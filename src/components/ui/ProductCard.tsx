@@ -23,8 +23,14 @@ export function ProductCard({ product }: ProductCardProps) {
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
+  // Format price in INR
+  const formatPrice = (price?: number) => {
+    if (price === undefined) return '0';
+    return new Intl.NumberFormat('en-IN').format(price);
+  };
+
   return (
-    <Link href={`/product/${product.slug}`} className="group block bg-white rounded-md hover:shadow-lg transition-shadow duration-200 border border-gray-100 overflow-hidden relative">
+    <Link href={`/product/${product.slug}`} className="group block bg-white rounded-2xl hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-all duration-500 border border-gray-100 overflow-hidden relative hover:-translate-y-2">
       {/* Discount Badge */}
       {discount > 0 && (
         <div className="absolute top-2 left-2 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded-sm z-10">
@@ -34,10 +40,13 @@ export function ProductCard({ product }: ProductCardProps) {
       
       {/* Image Container */}
       <div className="relative h-64 w-full bg-gray-50 flex items-center justify-center p-4">
-        <img 
+        <Image 
           src={product.imageUrl || defaultImage} 
           alt={product.name}
-          className="max-h-full max-w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
+          className="object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300 p-4"
+          priority={false}
         />
       </div>
       
@@ -61,11 +70,11 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* Pricing */}
         <div className="flex items-baseline gap-2 mt-2">
           <span className="text-lg font-bold text-gray-900">
-            ${product.price?.toFixed(2) || '0.00'}
+            ₹{formatPrice(product.price)}
           </span>
           {product.originalPrice && product.originalPrice > (product.price || 0) && (
             <span className="text-sm text-gray-500 line-through">
-              ${product.originalPrice.toFixed(2)}
+              ₹{formatPrice(product.originalPrice)}
             </span>
           )}
         </div>

@@ -1,52 +1,78 @@
-'use client';
-
 import React from 'react';
+import { Logo } from './Logo';
 
 export function LoaderPage() {
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white">
-      <div className="relative flex flex-col items-center justify-center mb-10">
-        
-        {/* Animated Cart Container */}
-        <div className="relative w-24 h-24 flex items-center justify-center">
-          {/* Background Pulse */}
-          <div className="absolute inset-0 bg-orange-100 rounded-full animate-ping opacity-75"></div>
+    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm transition-opacity duration-500">
+      {/* Top Progress Bar */}
+      <div className="fixed top-0 left-0 right-0 h-1 bg-gray-100 overflow-hidden">
+        <div className="h-full bg-gradient-to-r from-orange-400 via-orange-600 to-orange-400 w-1/3 animate-loading-bar"></div>
+      </div>
+      
+      <div className="relative flex flex-col items-center w-full max-w-md">
+        {/* Animated Custom Logo */}
+        <div className="relative w-full h-32 mb-12 flex items-center justify-center overflow-hidden">
+          {/* Track Line */}
+          <div className="absolute bottom-4 left-0 right-0 h-[2px] bg-gray-100 rounded-full"></div>
           
-          {/* Main Cart Icon */}
-          <div className="relative z-10 text-orange-500 animate-bounce">
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              strokeWidth="1.5" 
-              stroke="currentColor" 
-              className="w-14 h-14"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" 
-              />
-            </svg>
+          {/* Moving Cart Logo */}
+          <div className="absolute bottom-2 left-0 animate-cart-run">
+            <div className="animate-cart-bounce">
+              <Logo hideText={true} className="w-16 h-16" />
+            </div>
           </div>
+
+          {/* Speed Lines */}
+          <div className="absolute bottom-6 left-1/4 w-8 h-[1px] bg-orange-200 animate-speed-line"></div>
+          <div className="absolute bottom-8 left-1/2 w-12 h-[1px] bg-orange-100 animate-speed-line [animation-delay:0.5s]"></div>
+          <div className="absolute bottom-10 left-1/3 w-6 h-[1px] bg-orange-300 animate-speed-line [animation-delay:1s]"></div>
         </div>
 
-        {/* Loading track dots */}
-        <div className="mt-8 flex items-center space-x-3">
-          <div className="w-3.5 h-3.5 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-          <div className="w-3.5 h-3.5 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-          <div className="w-3.5 h-3.5 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+        {/* Text Area */}
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center">
+            <Logo />
+          </div>
+          
+          <p className="text-sm font-bold text-gray-400 uppercase tracking-[0.2em] animate-pulse">
+            Loading Excellence
+          </p>
         </div>
       </div>
 
-      <div className="text-center">
-        <h1 className="text-3xl font-black text-gray-900 tracking-widest uppercase bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-orange-400">
-          E-Kart
-        </h1>
-        <p className="text-gray-500 mt-3 text-sm font-semibold tracking-wide animate-pulse">
-          Starting Engine...
-        </p>
-      </div>
+      <style jsx global>{`
+        @keyframes loading-bar {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(300%); }
+        }
+        @keyframes cart-run {
+          0% { left: -20%; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { left: 100%; opacity: 0; }
+        }
+        @keyframes cart-bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px) rotate(-2deg); }
+        }
+        @keyframes speed-line {
+          0% { transform: scaleX(0); opacity: 0; transform-origin: right; }
+          50% { transform: scaleX(1); opacity: 1; }
+          100% { transform: scaleX(0); opacity: 0; transform-origin: left; }
+        }
+        .animate-loading-bar {
+          animation: loading-bar 2s infinite ease-in-out;
+        }
+        .animate-cart-run {
+          animation: cart-run 2.5s infinite linear;
+        }
+        .animate-cart-bounce {
+          animation: cart-bounce 0.4s infinite ease-in-out;
+        }
+        .animate-speed-line {
+          animation: speed-line 0.8s infinite linear;
+        }
+      `}</style>
     </div>
   );
 }
