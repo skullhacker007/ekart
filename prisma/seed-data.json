@@ -1,0 +1,87 @@
+{
+  "categories": [
+    {
+      "name": "Mobiles",
+      "slug": "mobiles",
+      "icon": "📱",
+      "color": "bg-blue-50 text-blue-600"
+    },
+    {
+      "name": "Electronics",
+      "slug": "electronics",
+      "icon": "💻",
+      "color": "bg-indigo-50 text-indigo-600"
+    },
+    {
+      "name": "Appliances",
+      "slug": "appliances",
+      "icon": "📺",
+      "color": "bg-purple-50 text-purple-600"
+    },
+    {
+      "name": "Fashion",
+      "slug": "fashion",
+      "icon": "👗",
+      "color": "bg-pink-50 text-pink-600"
+    },
+    {
+      "name": "Toys",
+      "slug": "toys",
+      "icon": "🧸",
+      "color": "bg-orange-50 text-orange-600"
+    },
+    {
+      "name": "Home",
+      "slug": "home",
+      "icon": "🛋️",
+      "color": "bg-teal-50 text-teal-600"
+    }
+  ],
+  "products": [
+    {
+      "name": "Apple iPhone 15 Pro Max (256 GB) - Natural Titanium",
+      "slug": "iphone-15-pro",
+      "price": 148900,
+      "rating": 4.8,
+      "reviewsCount": 3421,
+      "imageUrl": "https://m.media-amazon.com/images/I/81+GIkwqLIL._SX679_.jpg",
+      "categorySlug": "mobiles"
+    },
+    {
+      "name": "Sony WH-1000XM5 Wireless Noise Canceling Headphones",
+      "slug": "sony-xm5",
+      "price": 29990,
+      "rating": 4.6,
+      "reviewsCount": 8902,
+      "imageUrl": "https://m.media-amazon.com/images/I/41JACWT-wWL._SX300_SY300_QL70_FMwebp_.jpg",
+      "categorySlug": "electronics"
+    },
+    {
+      "name": "LG C3 Series 65-Inch Class OLED Smart TV",
+      "slug": "lg-c3-65",
+      "price": 164990,
+      "rating": 4.7,
+      "reviewsCount": 1244,
+      "imageUrl": "https://m.media-amazon.com/images/I/61c1QDw-4TL._SY450_.jpg",
+      "categorySlug": "electronics"
+    },
+    {
+      "name": "Samsung Galaxy Watch 6 Classic",
+      "slug": "galaxy-watch-6",
+      "price": 32999,
+      "rating": 4.5,
+      "reviewsCount": 432,
+      "imageUrl": "https://m.media-amazon.com/images/I/41Q+MNft5ML._SY300_SX300_QL70_FMwebp_.jpg",
+      "categorySlug": "electronics"
+    },
+    {
+      "name": "Dyson V15 Detect Cordless Vacuum Cleaner",
+      "slug": "dyson-v15",
+      "price": 65900,
+      "rating": 4.8,
+      "reviewsCount": 5621,
+      "imageUrl": "https://m.media-amazon.com/images/I/31DMXHLTSWL._SY300_SX300_QL70_FMwebp_.jpg",
+      "categorySlug": "appliances"
+    }
+  ]
+}

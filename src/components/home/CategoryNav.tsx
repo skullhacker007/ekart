@@ -1,27 +1,28 @@
-'use client';
-
 import React from 'react';
+import { prisma } from '@/src/lib/db/prisma';
 
-const CATEGORIES = [
-  { name: 'Mobiles', icon: '📱', color: 'bg-blue-50 text-blue-600' },
-  { name: 'Electronics', icon: '💻', color: 'bg-indigo-50 text-indigo-600' },
-  { name: 'Appliances', icon: '📺', color: 'bg-purple-50 text-purple-600' },
-  { name: 'Fashion', icon: '👗', color: 'bg-pink-50 text-pink-600' },
-  { name: 'Toys', icon: '🧸', color: 'bg-orange-50 text-orange-600' },
-  { name: 'Home', icon: '🛋️', color: 'bg-teal-50 text-teal-600' },
-];
+export async function CategoryNav() {
+  const categories = await prisma.category.findMany({
+    where: {
+      parentId: null, // Only top level categories for nav
+    },
+    orderBy: {
+      name: 'asc',
+    },
+  });
 
-export function CategoryNav() {
+  if (!categories || categories.length === 0) return null;
+
   return (
-    <div className="bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-gray-100 hidden md:block">
-      <div className="container-custom py-4">
-        <div className="flex justify-between items-center overflow-x-auto no-scrollbar gap-8">
-          {CATEGORIES.map((cat) => (
+    <div className="bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-gray-100">
+      <div className="container-custom py-2 md:py-4 px-2 md:px-12">
+        <div className="flex justify-start md:justify-around items-center overflow-x-auto no-scrollbar gap-4 md:gap-4 lg:gap-8 snap-x pb-1 md:pb-0">
+          {(categories as any[]).map((cat) => (
             <div 
-              key={cat.name} 
-              className="group flex flex-col items-center gap-2 cursor-pointer min-w-fit"
+              key={cat.id} 
+              className="group flex flex-col items-center gap-1 md:gap-2 cursor-pointer min-w-fit snap-center"
             >
-              <div className={`w-14 h-14 ${cat.color} rounded-2xl flex items-center justify-center text-2xl transition-all duration-300 group-hover:rounded-full group-hover:shadow-lg group-hover:-translate-y-1 group-active:scale-95`}>
+              <div className={`w-12 h-12 md:w-14 md:h-14 ${cat.color || 'bg-gray-50 text-gray-600'} rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-2xl transition-all duration-300 group-hover:rounded-full group-hover:shadow-lg group-hover:-translate-y-1 group-active:scale-95`}>
                 {cat.icon}
               </div>
               <span className="text-xs font-bold text-gray-600 group-hover:text-primary transition-colors tracking-tight uppercase">

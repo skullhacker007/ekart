@@ -30,7 +30,7 @@ export function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <Link href={`/product/${product.slug}`} className="group block bg-white rounded-2xl hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-all duration-500 border border-gray-100 overflow-hidden relative hover:-translate-y-2">
+    <Link href={`/product/${product.slug}`} className="group flex flex-col h-full bg-white rounded-xl md:rounded-2xl hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-all duration-500 border border-gray-100 overflow-hidden relative hover:-translate-y-2">
       {/* Discount Badge */}
       {discount > 0 && (
         <div className="absolute top-2 left-2 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded-sm z-10">
@@ -39,20 +39,20 @@ export function ProductCard({ product }: ProductCardProps) {
       )}
       
       {/* Image Container */}
-      <div className="relative h-64 w-full bg-gray-50 flex items-center justify-center p-4">
+      <div className="relative h-40 md:h-64 w-full bg-gray-50 flex items-center justify-center p-2 md:p-4">
         <Image 
           src={product.imageUrl || defaultImage} 
           alt={product.name}
           fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
-          className="object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300 p-4"
+          sizes="(max-width: 768px) 50vw, 20vw"
+          className="object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300 p-2 md:p-4"
           priority={false}
         />
       </div>
       
       {/* Product Details */}
-      <div className="p-4 flex flex-col gap-1">
-        <h3 className="text-sm font-medium text-gray-800 line-clamp-2 min-h-[40px] group-hover:text-secondary transition-colors">
+      <div className="p-3 md:p-4 flex flex-col flex-1 gap-1">
+        <h3 className="text-xs md:text-sm font-medium text-gray-800 line-clamp-2 min-h-[32px] md:min-h-[40px] group-hover:text-secondary transition-colors">
           {product.name}
         </h3>
         
@@ -68,8 +68,8 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
         
         {/* Pricing */}
-        <div className="flex items-baseline gap-2 mt-2">
-          <span className="text-lg font-bold text-gray-900">
+        <div className="flex flex-col sm:flex-row items-baseline gap-1 md:gap-2 mt-auto pt-2">
+          <span className="text-base md:text-lg font-bold text-gray-900">
             ₹{formatPrice(product.price)}
           </span>
           {product.originalPrice && product.originalPrice > (product.price || 0) && (

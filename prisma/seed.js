@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client';
-import seedData from './seed-data.json';
+const { PrismaClient } = require('@prisma/client');
+const seedData = require('./seed-data.json');
 
 const prisma = new PrismaClient();
 
@@ -7,7 +7,7 @@ async function main() {
   console.log('Start seeding from JSON source...');
 
   try {
-    const categoryMap: Record<string, string> = {};
+    const categoryMap = {};
 
     // 1. Upsert Categories
     for (const cat of seedData.categories) {
@@ -16,13 +16,13 @@ async function main() {
         update: {
           icon: cat.icon,
           color: cat.color,
-        } as any,
+        },
         create: {
           name: cat.name,
           slug: cat.slug,
           icon: cat.icon,
           color: cat.color,
-        } as any,
+        },
       });
       categoryMap[cat.slug] = category.id;
     }
@@ -35,7 +35,7 @@ async function main() {
         update: {
           rating: p.rating,
           reviewsCount: p.reviewsCount,
-        } as any,
+        },
         create: {
           name: p.name,
           slug: p.slug,
@@ -54,7 +54,7 @@ async function main() {
               price: p.price,
             },
           },
-        } as any,
+        },
       });
     }
 
@@ -68,11 +68,4 @@ async function main() {
   }
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+main();

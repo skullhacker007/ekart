@@ -5,28 +5,30 @@
 
 @layer base {
   :root {
-    --background: #ffffff; /* White body */
-    --foreground: #111111; /* Black fonts */
+    --background: #ffffff;
+    --foreground: #111111;
     
-    /* Primary E-commerce color (Orange) */
-    --primary: #fb641b; /* Flipkart-style Orange */
+    --primary: #fb641b;
     --primary-foreground: #ffffff;
     
-    /* Secondary Colors */
-    --secondary: #2874f0; /* Flipkart blue, used occasionally for links */
+    --secondary: #2874f0;
     --secondary-foreground: #ffffff;
     
-    /* Layout styling */
-    --muted: #f1f3f6; /* Flipkart off-white background for cards/sections */
-    --muted-foreground: #878787;
+    --muted: #f7f9fa; /* Slightly cleaner off-white */
+    --muted-foreground: #717478;
     
-    --border: #e0e0e0;
+    --border: #eef1f4;
   }
 
   body {
     background-color: var(--background);
     color: var(--foreground);
-    @apply antialiased;
+    font-family: var(--font-roboto), sans-serif;
+    @apply antialiased text-[15px] leading-relaxed;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight text-gray-900;
   }
 }
 
@@ -34,5 +36,18 @@
   /* Common e-commerce utility classes */
   .container-custom {
     @apply max-w-[1400px] mx-auto px-4 sm:px-6;
+  }
+
+  /* Dotted Loader Animation */
+  .dotted-loader::after {
+    content: '.';
+    animation: dots 1.5s steps(4, end) infinite;
+  }
+
+  @keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60% { content: '...'; }
+    80%, 100% { content: ''; }
   }
 }

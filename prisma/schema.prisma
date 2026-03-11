@@ -71,6 +71,8 @@ model Category {
   id        String   @id @default(uuid())
   name      String
   slug      String   @unique
+  icon      String?
+  color     String?
   parentId  String?
   path      String?
   createdAt DateTime @default(now())
@@ -96,6 +98,8 @@ model Product {
   name        String
   slug        String  @unique
   description String?
+  rating      Float?   @default(0)
+  reviewsCount Int?    @default(0)
 
   brandId    String?
   categoryId String

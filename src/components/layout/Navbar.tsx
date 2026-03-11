@@ -6,7 +6,7 @@ export function Navbar() {
     <header className="bg-white border-b border-gray-100 sticky top-0 z-[60] w-full shadow-sm">
       <div className="container-custom flex h-20 items-center justify-between gap-8">
         {/* Modern Logo Section */}
-        <Link href="/" className="group flex-shrink-0">
+        <Link href="/" className="group flex-shrink-0 z-[70]">
           <Logo />
         </Link>
 
@@ -24,11 +24,16 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Right Actions */}
-        <div className="flex items-center gap-4">
-          <Link href="/login" className="px-6 py-2.5 rounded-xl text-gray-700 font-bold text-sm hover:bg-gray-100 transition-all">
+        {/* Mobile Search & Actions */}
+        <div className="flex items-center gap-2 md:gap-4">
+          <button className="md:hidden p-2.5 text-gray-600 hover:bg-gray-100 rounded-xl transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </button>
+          
+          <Link href="/login" className="hidden sm:block px-6 py-2.5 rounded-xl text-gray-700 font-bold text-sm hover:bg-gray-100 transition-all">
             Login
           </Link>
+          
           <Link href="/cart" className="relative p-2.5 bg-gray-900 text-white rounded-xl flex items-center gap-2 shadow-lg hover:bg-gray-800 transition-all hover:-translate-y-0.5 active:scale-95 group">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
             <span className="hidden lg:inline font-bold text-sm">₹0.00</span>

@@ -4,13 +4,14 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
+  isLoading?: boolean;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className = '', variant = 'primary', size = 'md', fullWidth, ...props }, ref) => {
+  ({ className = '', variant = 'primary', size = 'md', fullWidth, isLoading, children, ...props }, ref) => {
     
     // Base classes
-    const baseClass = "inline-flex items-center justify-center rounded-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 disabled:opacity-50 disabled:pointer-events-none";
+    const baseClass = "inline-flex items-center justify-center rounded-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 disabled:opacity-50 disabled:pointer-events-none gap-2";
     
     // Variant classes using our CSS variables
     const variants = {
@@ -32,9 +33,19 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         ref={ref}
+        disabled={isLoading || props.disabled}
         className={`${baseClass} ${variants[variant]} ${sizes[size]} ${widthClass} ${className}`}
         {...props}
-      />
+      >
+        {isLoading ? (
+          <span className="flex items-center">
+            {children}
+            <span className="dotted-loader inline-block min-w-[1.2rem] text-left"></span>
+          </span>
+        ) : (
+          children
+        )}
+      </button>
     );
   }
 );

@@ -1,3 +1,4 @@
 {
-    "prisma.pinToPrisma6": true
+  "css.customData": [],
+  "css.lint.unknownAtRules": "ignore"
 }

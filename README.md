@@ -726,6 +726,9 @@ pnpm prisma generate
 
 # Open Prisma Studio GUI
 pnpm prisma studio
+
+# Add Framer and Lucide
+pnpm add framer-motion lucide-react react-use-measure
 ```
 
 ---
